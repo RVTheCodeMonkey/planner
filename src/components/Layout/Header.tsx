@@ -9,7 +9,7 @@ export function Header({ onAddTask, onManageZones }: { onAddTask: () => void; on
       <div className="flex items-center gap-2">
         <button
           onClick={onManageZones}
-          className="rounded-lg px-3 py-2 text-sm font-medium text-slate-300 active:text-white min-touch-target"
+          className="rounded-lg border border-slate-600 px-3 py-2 text-sm font-medium text-white active:bg-slate-700 min-touch-target"
         >
           Zones
         </button>

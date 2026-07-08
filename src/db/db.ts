@@ -4,7 +4,7 @@ import type { Task, Note } from '../types'
 const db = new Dexie('SitePlanner') as Dexie & {
   tasks: EntityTable<Task, 'id'>
   notes: EntityTable<Note, 'id'>
-  syncQueue: EntityTable<{ id?: number; action: string; table: string; recordId: number; payload: unknown; createdAt: string }, 'id'>
+  syncQueue: EntityTable<{ id?: number; action: string; table: string; recordId: string; payload: unknown; createdAt: string }, 'id'>
   settings: EntityTable<{ key: string; value: string[] }, 'key'>
 }
 
@@ -17,6 +17,13 @@ db.version(1).stores({
 db.version(2).stores({
   tasks: '++id, zone, status, startDate, endDate, syncStatus',
   notes: '++id, taskId, timestamp, syncStatus',
+  syncQueue: '++id, createdAt',
+  settings: 'key',
+})
+
+db.version(3).stores({
+  tasks: '&id, zone, status, startDate, endDate, syncStatus',
+  notes: '&id, taskId, timestamp, syncStatus',
   syncQueue: '++id, createdAt',
   settings: 'key',
 })

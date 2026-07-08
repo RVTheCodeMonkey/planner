@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useTasks } from './hooks/useTasks'
 import { useSettings } from './hooks/useSettings'
+import { useRealtimeSync } from './hooks/useRealtimeSync'
 import { Header } from './components/Layout/Header'
 import { TimelineView } from './components/Timeline/TimelineView'
 import { TaskModal } from './components/Tasks/TaskModal'
@@ -12,6 +13,7 @@ import type { Task } from './types'
 function App() {
   const { tasks, createTask } = useTasks()
   const { zones, subcontractors, addZone, renameZone, deleteZone, ensureDefaults } = useSettings()
+  useRealtimeSync()
   const [showTaskModal, setShowTaskModal] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)

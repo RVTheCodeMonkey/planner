@@ -8,6 +8,36 @@ services:
     networks:
       - web
 
+  postgres:
+    image: postgres:17-alpine
+    container_name: planner-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: planner
+      POSTGRES_PASSWORD: planner
+      POSTGRES_DB: siteplanner
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - web
+
+  api:
+    build: ./server
+    container_name: planner-api
+    restart: unless-stopped
+    environment:
+      PGHOST: postgres
+      PGUSER: planner
+      PGPASSWORD: planner
+      PGDATABASE: siteplanner
+    depends_on:
+      - postgres
+    networks:
+      - web
+
+volumes:
+  pgdata:
+
 networks:
   web:
     external: true

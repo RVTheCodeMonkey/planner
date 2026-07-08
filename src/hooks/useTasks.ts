@@ -1,6 +1,5 @@
 import { useLiveQuery } from './useLiveQuery'
 import { db } from '../db/db'
-import { enqueueSync } from '../db/sync'
 import type { Task } from '../types'
 
 export function useTasks() {
@@ -8,24 +7,24 @@ export function useTasks() {
 
   async function createTask(data: Omit<Task, 'id' | 'createdAt' | 'updatedAt' | 'syncStatus'>) {
     const now = new Date().toISOString()
-    const id = await db.tasks.add({
+    const id = crypto.randomUUID()
+    const task: Task = {
+      id,
       ...data,
       createdAt: now,
       updatedAt: now,
       syncStatus: 'pending',
-    } as Task)
-    if (id) await enqueueSync('create', 'tasks', id as number, data)
+    }
+    await db.tasks.add(task)
     return id
   }
 
-  async function updateTask(id: number, data: Partial<Omit<Task, 'id' | 'createdAt' | 'syncStatus'>>) {
+  async function updateTask(id: string, data: Partial<Omit<Task, 'id' | 'createdAt' | 'syncStatus'>>) {
     await db.tasks.update(id, { ...data, updatedAt: new Date().toISOString(), syncStatus: 'pending' })
-    await enqueueSync('update', 'tasks', id, data)
   }
 
-  async function deleteTask(id: number) {
+  async function deleteTask(id: string) {
     await db.tasks.delete(id)
-    await enqueueSync('delete', 'tasks', id, {})
   }
 
   return { tasks, createTask, updateTask, deleteTask }

@@ -1,0 +1,14 @@
+{
+  "name": "site-planner-api",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "pg": "^8.15.3",
+    "ws": "^8.18.2"
+  }
+}

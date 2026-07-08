@@ -1,9 +1,8 @@
 import { useLiveQuery } from './useLiveQuery'
 import { db } from '../db/db'
-import { enqueueSync } from '../db/sync'
 import type { Note } from '../types'
 
-export function useNotes(taskId: number | null) {
+export function useNotes(taskId: string | null) {
   const notes = useLiveQuery(
     () => (taskId ? db.notes.where('taskId').equals(taskId).sortBy('timestamp') : Promise.resolve([] as Note[])),
     [taskId],
@@ -11,12 +10,14 @@ export function useNotes(taskId: number | null) {
 
   async function addNote(data: Omit<Note, 'id' | 'createdAt' | 'syncStatus'>) {
     const now = new Date().toISOString()
-    const id = await db.notes.add({
+    const id = crypto.randomUUID()
+    const note: Note = {
+      id,
       ...data,
       createdAt: now,
       syncStatus: 'pending',
-    } as Note)
-    if (id) await enqueueSync('create', 'notes', id as number, data)
+    }
+    await db.notes.add(note)
     return id
   }
 

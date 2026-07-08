@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react'
+import Dexie from 'dexie'
 
-export function useLiveQuery<T>(query: () => Promise<T>, deps: unknown[] = []): T | undefined {
+export function useLiveQuery<T>(querier: () => T | Promise<T>, deps: unknown[] = []): T | undefined {
   const [result, setResult] = useState<T | undefined>(undefined)
 
   useEffect(() => {
-    let cancelled = false
-    query().then((data) => {
-      if (!cancelled) setResult(data)
+    const observable = Dexie.liveQuery(querier)
+    const subscription = observable.subscribe({
+      next: (value) => setResult(value as T),
+      error: () => {},
     })
-    return () => { cancelled = true }
+    return () => subscription.unsubscribe()
   }, deps)
 
   return result

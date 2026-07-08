@@ -1,7 +1,7 @@
 export type TaskStatus = 'todo' | 'in-progress' | 'blocked' | 'done'
 
 export interface Task {
-  id?: number
+  id?: string
   title: string
   zone: string
   subcontractor?: string
@@ -14,8 +14,8 @@ export interface Task {
 }
 
 export interface Note {
-  id?: number
-  taskId: number
+  id?: string
+  taskId: string
   timestamp: string
   user: string
   text: string
