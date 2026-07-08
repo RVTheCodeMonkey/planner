@@ -74,13 +74,13 @@ export function SettingsModal({
         <div className="mb-4 flex gap-2">
           <button
             onClick={() => setTab('zones')}
-            className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium min-touch-target ${tab === 'zones' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'}`}
+            className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium min-touch-target ${tab === 'zones' ? 'bg-green-600 text-white' : 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'}`}
           >
             Zones
           </button>
           <button
             onClick={() => setTab('subcontractors')}
-            className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium min-touch-target ${tab === 'subcontractors' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'}`}
+            className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium min-touch-target ${tab === 'subcontractors' ? 'bg-green-600 text-white' : 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'}`}
           >
             Subcontractors
           </button>
@@ -97,7 +97,7 @@ export function SettingsModal({
           <button
             onClick={onAdd}
             disabled={!newName.trim()}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50 min-touch-target"
+            className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50 min-touch-target"
           >
             Add
           </button>
@@ -115,7 +115,7 @@ export function SettingsModal({
                   onChange={(e) => setEditValue(e.target.value)}
                   onBlur={() => onRename(i)}
                   onKeyDown={(e) => e.key === 'Enter' && onRename(i)}
-                  className="flex-1 rounded border border-blue-500 px-2 py-1 text-sm dark:bg-slate-600 dark:text-white"
+                  className="flex-1 rounded border border-green-500 px-2 py-1 text-sm dark:bg-slate-600 dark:text-white"
                   autoFocus
                 />
               ) : (
@@ -123,7 +123,7 @@ export function SettingsModal({
               )}
               <button
                 onClick={() => { setEditingIndex(i); setEditValue(item) }}
-                className="rounded px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 dark:text-blue-400 min-touch-target"
+                className="rounded px-2 py-1 text-xs text-green-600 hover:bg-green-50 dark:text-green-400 min-touch-target"
               >
                 Rename
               </button>

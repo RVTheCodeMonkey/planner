@@ -2,7 +2,7 @@ import type { Task } from '../../types'
 import { TaskCard } from './TaskCard'
 
 const DAY_LABEL_WIDTH = 32
-const DAYS_RANGE = 42
+const DAYS_RANGE = 56
 
 function isToday(d: Date) {
   const now = new Date()
@@ -17,11 +17,13 @@ export function TimelineRow({
   label,
   tasks,
   dayHeaders,
+  weekStarts,
   onTaskClick,
 }: {
   label: string
   tasks: Task[]
   dayHeaders: Date[]
+  weekStarts: Set<number>
   onTaskClick: (task: Task) => void
 }) {
   return (
@@ -36,10 +38,12 @@ export function TimelineRow({
             key={d.toISOString()}
             className={`absolute top-0 h-full ${
               isToday(d)
-                ? 'border-l-2 border-l-blue-300 dark:border-l-blue-600'
+                ? 'border-l-2 border-l-green-300 dark:border-l-green-600'
                 : isWeekend(d)
                   ? 'border-l border-l-slate-100 dark:border-l-slate-800'
-                  : 'border-l border-l-slate-200 dark:border-l-slate-700'
+                  : weekStarts.has(i)
+                    ? 'border-l border-l-slate-400 dark:border-l-slate-500'
+                    : 'border-l border-l-slate-200 dark:border-l-slate-700'
             } ${i === dayHeaders.length - 1 ? 'border-r border-r-slate-200 dark:border-r-slate-700' : ''}`}
             style={{ left: i * DAY_LABEL_WIDTH, width: DAY_LABEL_WIDTH }}
           />

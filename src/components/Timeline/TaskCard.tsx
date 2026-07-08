@@ -1,7 +1,7 @@
 import type { Task } from '../../types'
 
 const STATUS_COLORS: Record<string, string> = {
-  todo: 'border-l-blue-500',
+  todo: 'border-l-green-500',
   'in-progress': 'border-l-amber-500',
   blocked: 'border-l-red-500',
   done: 'border-l-green-500',

@@ -135,7 +135,7 @@ export function TaskModal({
                   onClick={() => setForm({ ...form, status: s })}
                   className={`flex-1 rounded-lg px-3 py-2 text-xs font-medium ${
                     form.status === s
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-green-600 text-white'
                       : 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'
                   }`}
                 >
@@ -147,7 +147,7 @@ export function TaskModal({
 
           <button
             type="submit"
-            className="rounded-lg bg-blue-600 py-3 text-sm font-semibold text-white active:bg-blue-700 min-touch-target"
+            className="rounded-lg bg-blue-600 py-3 text-sm font-semibold text-white active:bg-green-700 min-touch-target"
           >
             {task ? 'Update Task' : 'Create Task'}
           </button>
