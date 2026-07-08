@@ -1,0 +1,19 @@
+import { useSyncExternalStore } from 'react'
+
+function getOnlineStatus() {
+  return navigator.onLine
+}
+
+function subscribe(callback: () => void) {
+  window.addEventListener('online', callback)
+  window.addEventListener('offline', callback)
+  return () => {
+    window.removeEventListener('online', callback)
+    window.removeEventListener('offline', callback)
+  }
+}
+
+export function useOnlineStatus() {
+  const isOnline = useSyncExternalStore(subscribe, getOnlineStatus)
+  return isOnline
+}

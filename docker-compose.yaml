@@ -1,0 +1,13 @@
+services:
+  planner:
+    build: .
+    container_name: planner
+    restart: unless-stopped
+    expose:
+      - 80
+    networks:
+      - web
+
+networks:
+  web:
+    external: true
