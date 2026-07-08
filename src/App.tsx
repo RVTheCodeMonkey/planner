@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 import { useTasks } from './hooks/useTasks'
 import { useSettings } from './hooks/useSettings'
 import { useRealtimeSync } from './hooks/useRealtimeSync'
@@ -11,15 +11,14 @@ import { SettingsModal } from './components/Settings/SettingsModal'
 import type { Task } from './types'
 
 function App() {
-  const { tasks, createTask } = useTasks()
-  const { zones, subcontractors, addZone, renameZone, deleteZone, ensureDefaults } = useSettings()
-  useRealtimeSync()
+  const { tasks, createTask, refresh } = useTasks()
+  const { zones, subcontractors, addZone, renameZone, deleteZone, addSubcontractor, renameSubcontractor, deleteSubcontractor } = useSettings()
+  useRealtimeSync(useCallback(() => { refresh() }, [refresh]))
+
   const [showTaskModal, setShowTaskModal] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
   const [showNotes, setShowNotes] = useState(false)
-
-  useEffect(() => { ensureDefaults() }, [])
 
   async function handleSaveTask(data: TaskFormData) {
     await createTask({
@@ -30,6 +29,7 @@ function App() {
       endDate: data.endDate,
       status: data.status,
     })
+    if (data.zone) addZone(data.zone)
     setShowTaskModal(false)
   }
 
@@ -42,7 +42,7 @@ function App() {
     <div className="flex min-h-dvh flex-col bg-white dark:bg-slate-950">
       <Header
         onAddTask={() => setShowTaskModal(true)}
-        onManageZones={() => setShowSettings(true)}
+        onSettings={() => setShowSettings(true)}
       />
       <main className="flex-1">
         <TimelineView tasks={tasks} zones={zones} onTaskClick={handleTaskClick} />
@@ -64,10 +64,15 @@ function App() {
       {showSettings && (
         <SettingsModal
           zones={zones}
+          subcontractors={subcontractors}
           addZone={addZone}
           renameZone={renameZone}
           deleteZone={deleteZone}
+          addSubcontractor={addSubcontractor}
+          renameSubcontractor={renameSubcontractor}
+          deleteSubcontractor={deleteSubcontractor}
           onClose={() => setShowSettings(false)}
+          onRefresh={refresh}
         />
       )}
     </div>

@@ -1,53 +1,114 @@
-import { useLiveQuery } from './useLiveQuery'
-import { db } from '../db/db'
+import { useState, useCallback } from 'react'
 import { DEFAULT_ZONES, DEFAULT_SUBCONTRACTORS } from '../types'
 
-async function ensureDefaults() {
-  const zones = await db.settings.get('zones')
-  if (!zones) await db.settings.put({ key: 'zones', value: [...DEFAULT_ZONES] })
-  const subs = await db.settings.get('subcontractors')
-  if (!subs) await db.settings.put({ key: 'subcontractors', value: [...DEFAULT_SUBCONTRACTORS] })
+function apiUrl() {
+  return `${window.location.protocol}//${window.location.host}`
+}
+
+function loadList(key: string, fallback: readonly string[]): string[] {
+  try {
+    const raw = localStorage.getItem(key)
+    if (raw) {
+      const parsed = JSON.parse(raw)
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed
+    }
+  } catch {}
+  return [...fallback]
+}
+
+function saveList(key: string, list: string[]) {
+  try { localStorage.setItem(key, JSON.stringify(list)) } catch {}
 }
 
 export function useSettings() {
-  const zonesSetting = useLiveQuery(() => db.settings.get('zones'), [])
-  const subsSetting = useLiveQuery(() => db.settings.get('subcontractors'), [])
+  const [zones, setZones] = useState<string[]>(() => loadList('zones', DEFAULT_ZONES))
+  const [subcontractors, setSubs] = useState<string[]>(() => loadList('subcontractors', DEFAULT_SUBCONTRACTORS))
 
-  const zones = zonesSetting?.value ?? [...DEFAULT_ZONES]
-  const subcontractors = subsSetting?.value ?? [...DEFAULT_SUBCONTRACTORS]
-
-  async function addZone(name: string) {
-    const current = await db.settings.get('zones')
-    const list = current?.value ?? [...DEFAULT_ZONES]
-    if (!list.includes(name)) {
-      await db.settings.put({ key: 'zones', value: [...list, name] })
-    }
-  }
-
-  async function renameZone(oldName: string, newName: string) {
-    const current = await db.settings.get('zones')
-    const list = current?.value ?? [...DEFAULT_ZONES]
-    const updated = await db.settings.put({
-      key: 'zones',
-      value: list.map((z) => (z === oldName ? newName : z)),
+  const addZone = useCallback(async (name: string) => {
+    setZones(prev => {
+      if (prev.includes(name)) return prev
+      const next = [...prev, name]
+      saveList('zones', next)
+      return next
     })
-    await db.tasks.where('zone').equals(oldName).modify({ zone: newName })
-    return updated
-  }
+  }, [])
 
-  async function deleteZone(name: string) {
-    const current = await db.settings.get('zones')
-    const list = current?.value ?? [...DEFAULT_ZONES]
-    await db.settings.put({ key: 'zones', value: list.filter((z) => z !== name) })
-  }
-
-  async function addSubcontractor(name: string) {
-    const current = await db.settings.get('subcontractors')
-    const list = current?.value ?? [...DEFAULT_SUBCONTRACTORS]
-    if (!list.includes(name)) {
-      await db.settings.put({ key: 'subcontractors', value: [...list, name] })
+  const renameZone = useCallback(async (oldName: string, newName: string) => {
+    try {
+      const r = await fetch(`${apiUrl()}/api/tasks`, { cache: 'no-store' })
+      if (r.ok) {
+        const tasks = await r.json()
+        for (const t of tasks) {
+          if (t.zone === oldName) {
+            await fetch(`${apiUrl()}/api/tasks/${t.id}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ zone: newName, updatedAt: new Date().toISOString() }),
+            })
+          }
+        }
+      }
+    } catch (e) {
+      console.error('rename zone task update failed', e)
     }
-  }
+    setZones(prev => {
+      if (!prev.includes(oldName)) return prev
+      const next = prev.map(z => z === oldName ? newName : z)
+      saveList('zones', next)
+      return next
+    })
+  }, [])
 
-  return { zones, subcontractors, addZone, renameZone, deleteZone, addSubcontractor, ensureDefaults }
+  const deleteZone = useCallback(async (name: string) => {
+    setZones(prev => {
+      const next = prev.filter(z => z !== name)
+      saveList('zones', next)
+      return next
+    })
+  }, [])
+
+  const addSubcontractor = useCallback(async (name: string) => {
+    setSubs(prev => {
+      if (prev.includes(name)) return prev
+      const next = [...prev, name]
+      saveList('subcontractors', next)
+      return next
+    })
+  }, [])
+
+  const renameSubcontractor = useCallback(async (oldName: string, newName: string) => {
+    try {
+      const r = await fetch(`${apiUrl()}/api/tasks`, { cache: 'no-store' })
+      if (r.ok) {
+        const tasks = await r.json()
+        for (const t of tasks) {
+          if (t.subcontractor === oldName) {
+            await fetch(`${apiUrl()}/api/tasks/${t.id}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ subcontractor: newName, updatedAt: new Date().toISOString() }),
+            })
+          }
+        }
+      }
+    } catch (e) {
+      console.error('rename subcontractor task update failed', e)
+    }
+    setSubs(prev => {
+      if (!prev.includes(oldName)) return prev
+      const next = prev.map(s => s === oldName ? newName : s)
+      saveList('subcontractors', next)
+      return next
+    })
+  }, [])
+
+  const deleteSubcontractor = useCallback(async (name: string) => {
+    setSubs(prev => {
+      const next = prev.filter(s => s !== name)
+      saveList('subcontractors', next)
+      return next
+    })
+  }, [])
+
+  return { zones, subcontractors, addZone, renameZone, deleteZone, addSubcontractor, renameSubcontractor, deleteSubcontractor }
 }

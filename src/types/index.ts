@@ -1,7 +1,7 @@
 export type TaskStatus = 'todo' | 'in-progress' | 'blocked' | 'done'
 
 export interface Task {
-  id?: string
+  id: string
   title: string
   zone: string
   subcontractor?: string
@@ -10,23 +10,16 @@ export interface Task {
   status: TaskStatus
   createdAt: string
   updatedAt: string
-  syncStatus: 'synced' | 'pending' | 'conflict'
 }
 
 export interface Note {
-  id?: string
+  id: string
   taskId: string
   timestamp: string
   user: string
   text: string
   imageUrls: string[]
   createdAt: string
-  syncStatus: 'synced' | 'pending' | 'conflict'
-}
-
-export interface Setting {
-  key: string
-  value: string[]
 }
 
 export const DEFAULT_ZONES = [

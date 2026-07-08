@@ -1,5 +1,6 @@
 import express from 'express'
 import cors from 'cors'
+import morgan from 'morgan'
 import { createServer } from 'http'
 import { WebSocketServer } from 'ws'
 import { pool, initDb } from './db.js'
@@ -10,6 +11,12 @@ const wss = new WebSocketServer({ server, path: '/ws' })
 
 app.use(cors())
 app.use(express.json())
+app.use(morgan('dev'))
+
+app.use((_req, res, next) => {
+  res.set('Cache-Control', 'no-store')
+  next()
+})
 
 const clients = new Set()
 wss.on('connection', (ws) => {
@@ -57,6 +64,11 @@ app.delete('/api/tasks/:id', async (req, res) => {
   await pool.query('DELETE FROM tasks WHERE id=$1', [req.params.id])
   broadcast({ type: 'task-deleted', data: { id: req.params.id } })
   res.status(204).end()
+})
+
+app.get('/api/notes', async (_req, res) => {
+  const { rows } = await pool.query('SELECT * FROM notes ORDER BY timestamp')
+  res.json(rows)
 })
 
 app.get('/api/tasks/:taskId/notes', async (req, res) => {

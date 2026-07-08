@@ -3,10 +3,10 @@ import { useNotes } from '../../hooks/useNotes'
 import { NoteForm } from './NoteForm'
 
 export function NotePanel({ task, onClose }: { task: Task; onClose: () => void }) {
-  const { notes, addNote } = useNotes(task.id ?? null)
+  const { notes, addNote } = useNotes(task.id)
 
   async function handleAddNote(text: string) {
-    if (!task.id) return
+
     await addNote({
       taskId: task.id,
       timestamp: new Date().toISOString(),

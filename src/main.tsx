@@ -10,7 +10,5 @@ createRoot(document.getElementById('root')!).render(
 )
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.addEventListener('controllerchange', () => {
-    window.location.reload()
-  })
+  navigator.serviceWorker.getRegistrations().then(r => r.forEach(s => s.unregister()))
 }

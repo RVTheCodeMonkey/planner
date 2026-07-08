@@ -1,57 +1,40 @@
 import { useEffect, useRef } from 'react'
-import { db } from '../db/db'
-import { setApiBase, processSyncQueue } from '../db/sync'
-import { useOnlineStatus } from './useOnlineStatus'
 
 function wsUrl() {
   const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
   return `${proto}//${window.location.host}/ws`
 }
 
-function apiUrl() {
-  return `${window.location.protocol}//${window.location.host}`
-}
-
-export function useRealtimeSync() {
-  const isOnline = useOnlineStatus()
-  const wsRef = useRef<WebSocket | null>(null)
+export function useRealtimeSync(onChange: () => void) {
+  const ref = useRef(onChange)
+  ref.current = onChange
 
   useEffect(() => {
-    setApiBase(apiUrl())
-  }, [])
+    let ws: WebSocket | null = null
+    let reconnectTimer: ReturnType<typeof setTimeout> | undefined
 
-  useEffect(() => {
-    if (!isOnline) return
+    function connect() {
+      if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) return
+      ws = new WebSocket(wsUrl())
 
-    const ws = new WebSocket(wsUrl())
-    wsRef.current = ws
+      ws.onmessage = () => {
+        ref.current()
+      }
 
-    ws.onmessage = async (event) => {
-      const msg = JSON.parse(event.data)
-      switch (msg.type) {
-        case 'task-created':
-          if (!(await db.tasks.get(msg.data.id))) {
-            await db.tasks.add({ ...msg.data, syncStatus: 'synced' })
-          }
-          break
-        case 'task-updated':
-          await db.tasks.put({ ...msg.data, syncStatus: 'synced' })
-          break
-        case 'task-deleted':
-          await db.tasks.delete(msg.data.id)
-          break
-        case 'note-created':
-          if (!(await db.notes.get(msg.data.id))) {
-            await db.notes.add({ ...msg.data, syncStatus: 'synced' })
-          }
-          break
+      ws.onopen = () => console.log('WS connected')
+
+      ws.onerror = () => ws?.close()
+
+      ws.onclose = () => {
+        reconnectTimer = setTimeout(connect, 3000)
       }
     }
 
-    ws.onopen = () => processSyncQueue()
+    connect()
 
-    return () => ws.close()
-  }, [isOnline])
-
-  return wsRef
+    return () => {
+      if (reconnectTimer) clearTimeout(reconnectTimer)
+      ws?.close()
+    }
+  }, [])
 }
