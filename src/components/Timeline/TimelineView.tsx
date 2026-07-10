@@ -88,9 +88,9 @@ export function TimelineView({
                   return (
                     <div
                       key={`m-${i}`}
-                      className={`flex shrink-0 items-center justify-center border-b text-[10px] font-semibold uppercase tracking-wider ${
+                      className={`flex shrink-0 items-center justify-center border-b text-[11px] font-semibold uppercase tracking-wider ${
                         weekStarts.has(i) ? 'border-l border-slate-400 dark:border-slate-500' : ''
-                      } border-slate-300 text-slate-500 dark:border-slate-600 dark:text-slate-400`}
+                      } border-slate-300 text-green-600 dark:border-slate-600 dark:text-green-400`}
                       style={{ width: DAY_LABEL_WIDTH, height: 18 }}
                     >
                       {showMonth ? monthLabels[d.getMonth()] : ''}
