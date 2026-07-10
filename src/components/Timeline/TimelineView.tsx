@@ -23,6 +23,10 @@ function isWeekend(d: Date) {
   return d.getDay() === 0 || d.getDay() === 6
 }
 
+function getDayLabel(d: Date) {
+  return ['Mo','Tu','We','Th','Fr','Sa','Su'][d.getDay() === 0 ? 6 : d.getDay() - 1]
+}
+
 function getWeekNumber(d: Date) {
   const copy = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()))
   const dayNum = copy.getUTCDay() || 7
@@ -31,7 +35,7 @@ function getWeekNumber(d: Date) {
   return Math.ceil((((copy.getTime() - yearStart.getTime()) / 86400000) + 1) / 7)
 }
 
-const DAYS_RANGE = 56
+const DAYS_RANGE = 150
 const PAST_DAYS = 14
 const DAY_LABEL_WIDTH = 32
 
@@ -144,7 +148,7 @@ export function TimelineView({
                     }`}
                     style={{ width: DAY_LABEL_WIDTH, height: 28 }}
                   >
-                    <span>{['Su','Mo','Tu','We','Th','Fr','Sa'][d.getDay()]}</span>
+                    <span>{getDayLabel(d)}</span>
                     <span>{d.getDate()}</span>
                   </div>
                 )

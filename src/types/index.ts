@@ -5,6 +5,7 @@ export interface Task {
   title: string
   zone: string
   subcontractor?: string
+  parentId?: string
   startDate: string
   endDate: string
   status: TaskStatus

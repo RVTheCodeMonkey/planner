@@ -11,31 +11,69 @@ import { SettingsModal } from './components/Settings/SettingsModal'
 import type { Task } from './types'
 
 function App() {
-  const { tasks, createTask, refresh } = useTasks()
+  const { tasks, createTask, updateTask, deleteTask, refresh } = useTasks()
   const { zones, subcontractors, addZone, renameZone, deleteZone, addSubcontractor, renameSubcontractor, deleteSubcontractor } = useSettings()
   useRealtimeSync(useCallback(() => { refresh() }, [refresh]))
 
   const [showTaskModal, setShowTaskModal] = useState(false)
+  const [editingTask, setEditingTask] = useState<Task | null>(null)
   const [showSettings, setShowSettings] = useState(false)
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
   const [showNotes, setShowNotes] = useState(false)
 
   async function handleSaveTask(data: TaskFormData) {
-    await createTask({
-      title: data.title,
-      zone: data.zone,
-      subcontractor: data.subcontractor || undefined,
-      startDate: data.startDate,
-      endDate: data.endDate,
-      status: data.status,
-    })
-    if (data.zone) addZone(data.zone)
+    if (editingTask) {
+      await updateTask(editingTask.id, {
+        title: data.title,
+        zone: data.zone,
+        subcontractor: data.subcontractor || undefined,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        status: data.status,
+      })
+      if (data.zone) addZone(data.zone)
+      setEditingTask(null)
+    } else {
+      await createTask({
+        title: data.title,
+        zone: data.zone,
+        subcontractor: data.subcontractor || undefined,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        status: data.status,
+      })
+      if (data.zone) addZone(data.zone)
+    }
     setShowTaskModal(false)
   }
 
   function handleTaskClick(task: Task) {
     setSelectedTask(task)
     setShowNotes(true)
+  }
+
+  function handleEditTask(task: Task) {
+    setEditingTask(task)
+    setSelectedTask(null)
+    setShowNotes(false)
+    setShowTaskModal(true)
+  }
+
+  async function handleDeleteTask(id: string) {
+    await deleteTask(id)
+    setSelectedTask(null)
+    setShowNotes(false)
+  }
+
+  async function handleAddSubtask(parentId: string, title: string, date: string) {
+    await createTask({
+      title,
+      zone: selectedTask?.zone || '',
+      parentId,
+      startDate: date,
+      endDate: date,
+      status: 'todo',
+    })
   }
 
   return (
@@ -50,15 +88,23 @@ function App() {
 
       {showTaskModal && (
         <TaskModal
+          task={editingTask}
           zones={zones}
           subcontractors={subcontractors}
           onSave={handleSaveTask}
-          onClose={() => setShowTaskModal(false)}
+          onClose={() => { setShowTaskModal(false); setEditingTask(null) }}
         />
       )}
 
       {showNotes && selectedTask && (
-        <NotePanel task={selectedTask} onClose={() => { setShowNotes(false); setSelectedTask(null) }} />
+        <NotePanel
+          task={selectedTask}
+          subtasks={tasks.filter(t => t.parentId === selectedTask.id)}
+          onAddSubtask={handleAddSubtask}
+          onEdit={handleEditTask}
+          onDelete={handleDeleteTask}
+          onClose={() => { setShowNotes(false); setSelectedTask(null) }}
+        />
       )}
 
       {showSettings && (

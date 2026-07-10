@@ -56,5 +56,27 @@ export function useNotes(taskId: string | null) {
     return id
   }
 
-  return { notes, addNote }
+  async function updateNote(id: string, text: string) {
+    try {
+      await fetch(`${apiUrl()}/api/notes/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      })
+      setNotes(prev => prev.map(n => n.id === id ? { ...n, text } : n))
+    } catch (e) {
+      console.error('update note failed', e)
+    }
+  }
+
+  async function deleteNote(id: string) {
+    try {
+      await fetch(`${apiUrl()}/api/notes/${id}`, { method: 'DELETE' })
+      setNotes(prev => prev.filter(n => n.id !== id))
+    } catch (e) {
+      console.error('delete note failed', e)
+    }
+  }
+
+  return { notes, addNote, updateNote, deleteNote }
 }

@@ -15,6 +15,7 @@ async function initDb() {
       title TEXT NOT NULL,
       zone TEXT NOT NULL,
       subcontractor TEXT,
+      parent_id TEXT REFERENCES tasks(id) ON DELETE CASCADE,
       start_date DATE NOT NULL,
       end_date DATE NOT NULL,
       status TEXT NOT NULL DEFAULT 'todo',
@@ -31,6 +32,8 @@ async function initDb() {
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
   `)
+  // migration: add parent_id if missing
+  try { await pool.query(`ALTER TABLE tasks ADD COLUMN parent_id TEXT REFERENCES tasks(id) ON DELETE CASCADE`) } catch {}
   console.log('Database tables ready')
 }
 

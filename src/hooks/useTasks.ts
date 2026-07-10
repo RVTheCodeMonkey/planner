@@ -6,13 +6,15 @@ function apiUrl() {
 }
 
 function mapTask(item: any): Task {
+  function norm(d: string | undefined) { return d ? d.slice(0, 10) : '' }
   return {
     id: item.id,
     title: item.title,
     zone: item.zone,
     subcontractor: item.subcontractor,
-    startDate: item.startDate ?? item.start_date,
-    endDate: item.endDate ?? item.end_date,
+    parentId: item.parent_id || item.parentId,
+    startDate: norm(item.startDate) || norm(item.start_date) || '',
+    endDate: norm(item.endDate) || norm(item.end_date) || '',
     status: item.status,
     createdAt: item.createdAt ?? item.created_at,
     updatedAt: item.updatedAt ?? item.updated_at,
