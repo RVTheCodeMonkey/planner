@@ -19,6 +19,8 @@ const FULL_MONTHS = ['January','February','March','April','May','June','July','A
 export function DatePicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
+  const btnRef = useRef<HTMLButtonElement>(null)
+  const [pos, setPos] = useState({ top: 0, left: 0 })
 
   const sel = value ? isoParts(value) : (() => { const d = new Date(); return { year: d.getFullYear(), month: d.getMonth(), day: d.getDate() } })()
   const [viewMonth, setViewMonth] = useState(sel.year * 12 + sel.month)
@@ -55,17 +57,32 @@ export function DatePicker({ value, onChange }: { value: string; onChange: (v: s
     setOpen(false)
   }
 
+  function handleOpen() {
+    if (open) { setOpen(false); return }
+    const r = btnRef.current?.getBoundingClientRect()
+    if (r) {
+      let left = r.left
+      if (left + 256 > window.innerWidth) left = r.right - 256
+      setPos({ top: r.bottom + 4, left })
+    }
+    setOpen(true)
+  }
+
   return (
     <div ref={ref} className="relative">
       <button
+        ref={btnRef}
         type="button"
-        onClick={() => setOpen(!open)}
-        className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-left dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+        onClick={handleOpen}
+        className="w-full rounded-lg border border-slate-300 px-3 py-3 text-sm text-left dark:border-slate-600 dark:bg-slate-700 dark:text-white"
       >
         {value ? formatDisplay(sel.year, sel.month, sel.day) : 'Select date'}
       </button>
       {open && (
-        <div className="absolute top-full left-0 z-40 mt-1 w-64 rounded-lg border border-slate-200 bg-white p-3 shadow-lg dark:border-slate-600 dark:bg-slate-800">
+        <div
+          className="fixed z-50 mt-1 w-64 rounded-lg border border-slate-200 bg-white p-3 shadow-lg dark:border-slate-600 dark:bg-slate-800"
+          style={{ top: pos.top, left: pos.left }}
+        >
           <div className="mb-2 flex items-center justify-between">
             <button type="button" onClick={() => setViewMonth(viewMonth - 1)} className="p-1 text-slate-500 hover:text-slate-800 dark:hover:text-white">‹</button>
             <span className="text-sm font-semibold text-slate-800 dark:text-white">{FULL_MONTHS[month]} {year}</span>

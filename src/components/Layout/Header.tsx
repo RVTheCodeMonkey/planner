@@ -1,4 +1,4 @@
-export function Header({ onAddTask, onSettings }: { onAddTask: () => void; onSettings: () => void }) {
+export function Header({ onAddTask, onSettings, onPrint }: { onAddTask: () => void; onSettings: () => void; onPrint?: () => void }) {
   return (
     <header className="sticky top-0 z-50 flex items-center justify-between border-b-2 border-slate-600 bg-slate-900 px-4 py-3 text-white">
       <h1 className="flex items-baseline gap-0 text-lg tracking-tight">
@@ -12,7 +12,13 @@ export function Header({ onAddTask, onSettings }: { onAddTask: () => void; onSet
           onClick={onSettings}
           className="rounded-lg border border-slate-600 px-3 py-2 text-xs font-medium text-white active:bg-slate-700 min-touch-target"
         >
-Settings
+          Settings
+        </button>
+        <button
+          onClick={onPrint}
+          className="rounded-lg border border-slate-600 px-3 py-2 text-xs font-medium text-white active:bg-slate-700 min-touch-target"
+        >
+          Print week
         </button>
         <button
           onClick={onAddTask}

@@ -79,7 +79,16 @@ app.delete('/api/tasks/:id', async (req, res) => {
   res.status(204).end()
 })
 
-app.get('/api/notes', async (_req, res) => {
+app.get('/api/notes', async (req, res) => {
+  const { taskIds } = req.query
+  if (taskIds && taskIds.length > 0) {
+    const ids = taskIds.split(',')
+    const { rows } = await pool.query(
+      'SELECT * FROM notes WHERE task_id = ANY($1) ORDER BY timestamp',
+      [ids],
+    )
+    return res.json(rows)
+  }
   const { rows } = await pool.query('SELECT * FROM notes ORDER BY timestamp')
   res.json(rows)
 })

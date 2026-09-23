@@ -52,7 +52,7 @@ export function NotePanel({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50">
-      <div className="flex h-[70vh] w-full max-w-md flex-col rounded-t-2xl bg-white sm:h-auto sm:max-h-[80vh] sm:rounded-2xl dark:bg-slate-800">
+      <div className="flex h-[85vh] w-full max-w-md flex-col rounded-t-2xl bg-white sm:h-auto sm:max-h-[90vh] sm:rounded-2xl dark:bg-slate-800">
         <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-700">
           <div>
             <h3 className="font-semibold text-slate-900 dark:text-white">{task.title}</h3>
@@ -94,14 +94,14 @@ export function NotePanel({
                 value={newSubtask}
                 onChange={(e) => setNewSubtask(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleAddSubtask()}
-                className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                className="flex-1 rounded-lg border border-slate-300 px-3 py-3 text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                 placeholder="Subtask title..."
               />
               <DatePicker value={newSubtaskDate} onChange={setNewSubtaskDate} />
               <button
                 onClick={handleAddSubtask}
                 disabled={!newSubtask.trim()}
-                className="rounded-lg bg-green-600 px-4 py-2 text-xs font-medium text-white disabled:opacity-50 min-touch-target"
+                className="rounded-lg bg-green-600 px-5 py-3 text-sm font-medium text-white disabled:opacity-50 min-touch-target"
               >
                 Add
               </button>

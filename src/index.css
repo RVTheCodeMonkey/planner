@@ -1,1 +1,49 @@
 @import "tailwindcss";
+
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 8mm;
+  }
+
+  html,
+  body {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Hide screen UI */
+  header,
+  .screen-only,
+  .fixed,
+  button {
+    display: none !important;
+  }
+
+  /* Force print view visible */
+  .print-weekly {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  .print-grid {
+    display: grid !important;
+    grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+  }
+
+  .print-day {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .print-task {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+}

@@ -8,6 +8,7 @@ import { TaskModal } from './components/Tasks/TaskModal'
 import type { TaskFormData } from './components/Tasks/TaskModal'
 import { NotePanel } from './components/Notes/NotePanel'
 import { SettingsModal } from './components/Settings/SettingsModal'
+import { PrintWeeklyOverview } from './components/Print/PrintWeeklyOverview'
 import type { Task } from './types'
 
 function App() {
@@ -81,10 +82,13 @@ function App() {
       <Header
         onAddTask={() => setShowTaskModal(true)}
         onSettings={() => setShowSettings(true)}
+        onPrint={() => window.print()}
       />
-      <main className="flex-1">
+      <main className="flex-1 screen-only">
         <TimelineView tasks={tasks} zones={zones} onTaskClick={handleTaskClick} />
       </main>
+
+      <PrintWeeklyOverview tasks={tasks} />
 
       {showTaskModal && (
         <TaskModal
